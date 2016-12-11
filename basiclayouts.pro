@@ -9,5 +9,5 @@ SOURCES     = dialog.cpp \
     renderarea.cpp
 
 # install
-target.path = $$[QT_INSTALL_EXAMPLES]/andrei/basiclayouts
+target.path = $$[QT_INSTALL_EXAMPLES]/home/andrei/basiclayouts
 INSTALLS += target

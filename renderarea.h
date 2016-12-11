@@ -14,19 +14,16 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
-public slots:
-
-    void generateMandelbrot();
+    void generateMandelbrot(QString numPCsQString, QString numIterationsQString);
 
 protected:
+
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 private:
 
+    int numPCs, numIterations, total;
     bool teste = false;
-    QString *blabla;
-    QString *bleble;
-    void setMaxSize();
 
 };
 

@@ -14,7 +14,7 @@ class QPushButton;
 
 QT_END_NAMESPACE
 
-//class RenderArea;
+class RenderArea;
 
 class Window: public QWidget
 {
@@ -22,17 +22,19 @@ class Window: public QWidget
 
 public:
     Window();
-    static QString getNumIterations();
-    static QString getNumPCs();
-    static void setErrorVisible();
-    static void setErrorNotVisible();
+
+private slots:
+
+    void activate();
 
 private:
-    static QLineEdit *numIterationsLEdit;
-    static QLineEdit *numPCsLEdit;
+
+    RenderArea *renderArea;
+    QLineEdit *numIterationsLEdit;
+    QLineEdit *numPCsLEdit;
     QLabel *numIterationsLabel;
     QLabel *numPCsLabel;
-    static QLabel *error;
+    QLabel *error;
     QPushButton *generate;
 
 };

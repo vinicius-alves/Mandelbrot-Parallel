@@ -5,7 +5,7 @@
 
 Window::Window()
 {
-    RenderArea *renderArea = new RenderArea();
+    renderArea = new RenderArea();
 
     numIterationsLabel = new QLabel (QString::fromUtf8("Numero de iteracoes"));
     numPCsLabel = new QLabel (QString::fromUtf8("Numero de PCs"));
@@ -21,7 +21,7 @@ Window::Window()
 
     generate = new QPushButton (QString::fromUtf8("Gerar Conjunto"));
 
-    connect (generate, SIGNAL(clicked(bool)), renderArea, SLOT (generateMandelbrot ()));
+    connect (generate, SIGNAL(clicked(bool)), this, SLOT (activate ()));
 
     QVBoxLayout *vertLayout = new QVBoxLayout;
     QHBoxLayout *horiLayout1 = new QHBoxLayout;
@@ -43,24 +43,7 @@ Window::Window()
 
 }
 
-QString Window::getNumIterations()
+void Window::activate()
 {
-    return numIterationsLEdit->text();
+    renderArea->generateMandelbrot (numPCsLEdit->text(), numIterationsLEdit->text());
 }
-
-QString Window::getNumPCs()
-{
-    return numPCsLEdit->text();
-}
-
-void Window::setErrorVisible()
-{
-    error->setVisible(true);
-}
-
-void Window::setErrorNotVisible()
-{
-    error->setVisible(false);
-}
-
-

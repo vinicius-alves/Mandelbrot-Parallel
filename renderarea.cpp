@@ -24,16 +24,22 @@ QSize RenderArea::sizeHint() const
     return QSize(640, 480);
 }
 
-void RenderArea::generateMandelbrot()
+void RenderArea::generateMandelbrot(QString numPCsQString, QString numIterationsQString)
 {
-    //int numIterations = strtol ((String)(Window::getNumIterations()));
-    //int numPCs = strtol (static_cast <String>(Window::getNumPCs()));
 
-    //if (numIterations != 0 && numPCs != 0)
-    //{
-    //    teste = true;
-    //}
-    //teste = false;
+    bool ok1, ok2;
+
+    numPCs = numPCsQString.toInt(&ok1);
+    numIterations = numIterationsQString.toInt(&ok2);
+
+    if (ok1 && ok2 && numPCs != 0 && numIterations != 0)
+    {
+        total = numPCs + numIterations;
+        teste = true;
+    }
+    else
+        teste = false;
+
     update();
 
 }
@@ -48,9 +54,8 @@ void RenderArea::paintEvent(QPaintEvent * /* event */){
 
     painter.translate((width()/2), (height()/2));
 
-    if (teste)
+    if (!teste)
     {
-        Window::setErrorNotVisible();
         static const QPoint points[4] = {
             QPoint(200, 200),
             QPoint(-10, -50),
@@ -59,12 +64,8 @@ void RenderArea::paintEvent(QPaintEvent * /* event */){
         };
         painter.drawPoints(points, 4);
 
-        painter.drawText(0, 0, *blabla);
-        painter.drawText(50, 50, *bleble);
+    }
+   else
+        painter.drawPoint(total, total);
 
-    }
-    else
-    {
-        Window::setErrorVisible();
-    }
 }
