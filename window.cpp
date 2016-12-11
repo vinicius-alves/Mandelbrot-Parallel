@@ -3,47 +3,30 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 
-Window::Window()
+Window::Window(int width, int height, int numPCs, int numIterations, int *matPoints)
 {
     renderArea = new RenderArea();
 
-    numIterationsLabel = new QLabel (QString::fromUtf8("Numero de iteracoes"));
-    numPCsLabel = new QLabel (QString::fromUtf8("Numero de PCs"));
-    error = new QLabel (QString::fromUtf8("Insira valores positivos validos para PCs e iteraçoes"));
+    QString numPCsQString;
+    QString numIterationsQString;
 
-    error->setVisible(false);
+    numPCsQString.setNum(numPCs);
+    numIterationsQString.setNum(numIterations);
 
-    numIterationsLEdit = new QLineEdit;
-    numPCsLEdit = new QLineEdit;
-
-    numIterationsLabel->setBuddy(numIterationsLEdit);
-    numPCsLabel->setBuddy(numPCsLEdit);
-
-    generate = new QPushButton (QString::fromUtf8("Gerar Conjunto"));
-
-    connect (generate, SIGNAL(clicked(bool)), this, SLOT (activate ()));
+    numIterationsLabel = new QLabel ((QString::fromUtf8("Número de iterações: ")).append(numIterationsQString));
+    numPCsLabel = new QLabel ((QString::fromUtf8("Número de PCs: ")).append(numPCsQString));
 
     QVBoxLayout *vertLayout = new QVBoxLayout;
-    QHBoxLayout *horiLayout1 = new QHBoxLayout;
-    QHBoxLayout *horiLayout2 = new QHBoxLayout;
+    QHBoxLayout *horiLayout = new QHBoxLayout;
 
-    horiLayout1->addWidget(numPCsLabel);
-    horiLayout1->addWidget(numPCsLEdit);
+    horiLayout->addWidget(numPCsLabel);
+    horiLayout->addWidget(numIterationsLabel);
 
-    horiLayout2->addWidget(numIterationsLabel);
-    horiLayout2->addWidget(numIterationsLEdit);
-
-    vertLayout->addLayout(horiLayout1);
-    vertLayout->addLayout(horiLayout2);
-    vertLayout->addWidget(error);
+    vertLayout->addLayout(horiLayout);
     vertLayout->addWidget(renderArea);
-    vertLayout->addWidget(generate);
 
     setLayout(vertLayout);
 
-}
+    renderArea->setPaintMatrix(width, height, matPoints);
 
-void Window::activate()
-{
-    renderArea->generateMandelbrot (numPCsLEdit->text(), numIterationsLEdit->text());
 }

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+using namespace std;
+
 class RenderArea: public QWidget
 {
     Q_OBJECT
@@ -14,7 +16,7 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
-    void generateMandelbrot(QString numPCsQString, QString numIterationsQString);
+    void setPaintMatrix (int matWidth, int matHeight, int *pointsMatrix);
 
 protected:
 
@@ -22,8 +24,8 @@ protected:
 
 private:
 
-    int numPCs, numIterations, total;
-    bool teste = false;
+    int numPCs, numIterations, width, height;
+    int mandelbrotSet[640][480];
 
 };
 

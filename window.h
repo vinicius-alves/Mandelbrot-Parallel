@@ -21,21 +21,13 @@ class Window: public QWidget
     Q_OBJECT
 
 public:
-    Window();
-
-private slots:
-
-    void activate();
+    Window(int width, int height, int numPCs, int numIterations, int *matPoints);
 
 private:
 
     RenderArea *renderArea;
-    QLineEdit *numIterationsLEdit;
-    QLineEdit *numPCsLEdit;
     QLabel *numIterationsLabel;
     QLabel *numPCsLabel;
-    QLabel *error;
-    QPushButton *generate;
 
 };
 

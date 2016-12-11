@@ -54,11 +54,22 @@
 
 #include <QLabel>
 
+
 int main(int argc, char *argv[])
 {
 
     QApplication app(argc, argv);
-    Window window;
+
+    int a = 640;
+    int b = 480;
+    int matrix[a][b];
+
+    for (int i = 0; i < a; i++)
+        for (int j = 0; j < b; j++)
+            matrix[i][j] = rand()%1;
+
+    Window window(a, b, 1, 1, *matrix);
     window.show();
     return app.exec();
+
 }
