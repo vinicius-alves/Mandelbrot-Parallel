@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <omp.h>
+#include <mpi.h>
 #define PASSO 0.005
 
 using namespace std;
@@ -23,12 +24,20 @@ inline bool verificarPonto(const float &x, const float &y, float &cnt){
 } 
 
 
-int main(void){
+int main(int argc, char* argv[]){
+
+	int taskid, numtasks;	
+   
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
+    MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
 	register const unsigned short dimensao_x= 3/PASSO;
 	register const unsigned short dimensao_y= 1/PASSO;
 
-	cout<<"Programa iniciado com "<<dimensao_x*dimensao_y << " pontos"<<endl;
+	if(taskid==0){
+		cout<<"Programa iniciado com "<<dimensao_x*dimensao_y << " pontos"<<endl;
+	}
 
 	float matriz[dimensao_x][dimensao_y][3];
 	//bool results[dimensao_x][dimensao_y];
@@ -39,13 +48,14 @@ int main(void){
 	string json="";//"{";
 	string meta = "";
 	string tempx, tempy,tempd;
-
 	ofstream out;
-	out.open("data.csv");
+	if(taskid==0){
+		out.open("data.csv");
+	}
 	unsigned short rank;
 
 	// gera uma matriz de pontos
-	#pragma omp parallel private(rank,x,y,d,tempx,tempy,tempd,i,j) firstprivate(meta) shared(matriz,json)
+	#pragma omp parallel private(rank,x,y,d,tempx,tempy,tempd,i,j) firstprivate(meta,taskid) shared(matriz,json)
 	{
 		rank = omp_get_thread_num();
 		
@@ -54,7 +64,12 @@ int main(void){
 		for(i=0;i<dimensao_x;i++){
 			for (j=0;j<dimensao_y;j++){
 				matriz[i][j][0]=i*PASSO-2;
-				matriz[i][j][1]=j*PASSO-0;	
+				if(taskid==0){
+					matriz[i][j][1]=j*PASSO-0;
+				}
+				else{
+					matriz[i][j][1]=j*PASSO-1;
+				}	
 
 			}
 		}
@@ -90,9 +105,27 @@ int main(void){
 
 	}
 	//json.pop_back();
+	
+	if(taskid==1){
 
-	out << json;//<<"};";
-	out.close();
+		MPI::COMM_WORLD.Send(json.c_str(), json.length(), MPI::CHAR, 0, 1);
+	}
+	else if(taskid==0){
+		MPI::Status status;
+		MPI::COMM_WORLD.Probe(1, 1, status);
+		int l = status.Get_count(MPI::CHAR);
+		char *buf = new char[l];
+		MPI::COMM_WORLD.Recv(buf, l, MPI::CHAR, 1, 1, status);
+		string jsonReceived(buf, l);
+		cout<<"received: "<<jsonReceived<<endl;
+		delete [] buf;
+	
+		out << json;//<<"};";
+		out << jsonReceived;
+		out.close();
+	}
+
+	MPI_Finalize();
 
 		return 0;
 }
