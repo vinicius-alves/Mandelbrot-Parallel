@@ -7,12 +7,6 @@
 #include <mpi.h>
 #define PASSO 0.005
 
-/*
-Para rodar:
-mpic++ -fopenmp -std=c++11 -o mpi mpi.cpp
-mpirun -np 2 ./mpi
-*/
-
 using namespace std;
 
 // verifica se um dado ponto pertence ao conjunto de mandelbrot
@@ -62,13 +56,12 @@ int main(int argc, char* argv[]){
 	double startClock;
 
 	register float x,y,d;
-	string json="";
+	string json="";//"{";
 	string meta = "";
 	string tempx, tempy,tempd;
 	ofstream out;
 	if(taskid==0){
 		out.open("data.csv");
-		out<<"float matriz["<<dimensao_x*dimensao_y*2<<"][3] = {";
 	}
 	unsigned short rank;
 
@@ -97,6 +90,7 @@ int main(int argc, char* argv[]){
 				else{
 					matriz[i][j][1]=j*PASSO-1;
 				}	
+
 			}
 		}
 
@@ -119,7 +113,12 @@ int main(int argc, char* argv[]){
 				tempy = to_string(y).substr(0,6);
 				tempd = to_string(d).substr(0,5);
 				
-				meta+="{"+tempx+","+tempy+","+tempd+"},";	
+				//meta+="{"+tempx+","+tempy+","+tempd+"},";
+				if(verificarPonto(x,y,matriz[i][j][2])){
+					meta+= tempx +" "+ tempy+" \n";
+
+				}
+				
 			
 			}
 		}
@@ -134,7 +133,9 @@ int main(int argc, char* argv[]){
 			cout<<"\nEstabelecendo comunicação entre os processos."<<endl;
 			startClock = MPI_Wtime();
 		}
+
 	}
+	//json.pop_back();
 	
 	if(taskid==1){
 
@@ -150,11 +151,11 @@ int main(int argc, char* argv[]){
 		delete [] buf;
 
 		cout<<"Comunicação finalizada em: "<< MPI_Wtime() -startClock<<"s."<<endl;
-		jsonReceived.pop_back();
-		out << json;
-		out << jsonReceived<<"};";
-		out.close();
 		cout<<"\nJob Concluído!"<<endl;
+	
+		out << json;//<<"};";
+		out << jsonReceived;
+		out.close();
 	}
 
 	MPI_Finalize();
