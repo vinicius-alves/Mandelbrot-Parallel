@@ -42,6 +42,7 @@ int main(int argc, char* argv[]){
     	cout<<"Sistemas Operacionais - 13/12/2016"<<endl;
     	cout<<"Andrei e Vinicius"<<endl;
     	cout<<"Conjunto de Mandelbrot Paralelo\n"<<endl;
+    	cout<<"Arquivo de saída: "<<argv[1]<<"."<<endl;
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 
@@ -53,7 +54,7 @@ int main(int argc, char* argv[]){
 	register const unsigned short dimensao_y= 1/PASSO;
 
 	if(taskid==0){
-		cout<<"Programa iniciado com "<<dimensao_x*dimensao_y << " pontos.\n"<<endl;
+		cout<<"Programa iniciado com "<<dimensao_x*dimensao_y*2 << " pontos.\n"<<endl;
 	}
 
 	float matriz[dimensao_x][dimensao_y][3];
@@ -67,8 +68,8 @@ int main(int argc, char* argv[]){
 	string tempx, tempy,tempd;
 	ofstream out;
 	if(taskid==0){
-		out.open("data.csv");
-		out<<"float matriz["<<dimensao_x*dimensao_y*2<<"][3] = {";
+		out.open(argv[1]);
+		out<<"float matriz["<<dimensao_x*dimensao_y*2<<"][3] = {\n";
 	}
 	unsigned short rank;
 
@@ -152,7 +153,7 @@ int main(int argc, char* argv[]){
 		cout<<"Comunicação finalizada em: "<< MPI_Wtime() -startClock<<"s."<<endl;
 		jsonReceived.pop_back();
 		out << json;
-		out << jsonReceived<<"};";
+		out << jsonReceived<<"\n};";
 		out.close();
 		cout<<"\nJob Concluído!"<<endl;
 	}
