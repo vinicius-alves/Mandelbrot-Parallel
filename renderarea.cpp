@@ -6,8 +6,11 @@
 RenderArea::RenderArea(QWidget *parent)
     : QWidget(parent)
 {
-    setBackgroundRole(QPalette::Base);
+    QPalette Pal(palette());
+    Pal.setColor(QPalette::Background, Qt::black);
+
     setAutoFillBackground(true);
+    setPalette(Pal);
 }
 
 QSize RenderArea::minimumSizeHint() const
@@ -20,31 +23,25 @@ QSize RenderArea::sizeHint() const
     return QSize(640, 480);
 }
 
-void RenderArea::setPaintMatrix(int matWidth, int matHeight, int *pointsMatrix)
+void RenderArea::setPaintMatrix(int numIters, float *pointsMatrix)
 {
-    width = matWidth;
-    height = matHeight;
-    //for (int i = 0; i < width; i++)
-      //  for (int j = 0; j < height; j++)
-        //    mandelbrotSet[i][j] = 0;
-    std::copy(pointsMatrix, pointsMatrix + width*height, &mandelbrotSet[0][0]);
-//    for (int i = 0; i < width; i++)
-//        for (int j = 0; j < height; j++)
-//            mandelbrotSet[i][j] = pointsMatrix[i][j];
+    numIterations = numIters;
+    std::copy(pointsMatrix, pointsMatrix + 30000, &mandelbrotSet[0][0]);
+
     update();
 }
 
 void RenderArea::paintEvent(QPaintEvent * /* event */)
 {
-    QPen pen (QPen(Qt::blue, 2, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin));
-
     QPainter painter(this);
-    painter.setPen(pen);
     painter.setRenderHint(QPainter::Antialiasing, false);
-
-    for (int i = 0; i < width; i++)
-        for (int j = 0; j < height; j++)
-            if (mandelbrotSet[i][j] > 0)
-                painter.drawPoint(i, j);
-
+    //painter.translate(width()/2, height()/2);
+    for (int i = 0; i < 10000; i++)
+    {
+        QColor color((trunc(200*mandelbrotSet[i][2]/numIterations)), (trunc(255*mandelbrotSet[i][2]/numIterations)),
+                (trunc(100*mandelbrotSet[i][2]/numIterations)));
+        QPen pen (QPen(color, 2, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+        painter.setPen(pen);
+        painter.drawPoint(mandelbrotSet[i][0] * 0.9*width(), mandelbrotSet[i][1] * 0.9*height());
+    }
 }

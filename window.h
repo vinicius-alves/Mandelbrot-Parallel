@@ -21,13 +21,13 @@ class Window: public QWidget
     Q_OBJECT
 
 public:
-    Window(int width, int height, int numPCs, int numIterations, int *matPoints);
+    Window(int numIterations, float *matPoints);
 
 private:
 
     RenderArea *renderArea;
     QLabel *numIterationsLabel;
-    QLabel *numPCsLabel;
+    //QLabel *numPCsLabel;
 
 };
 

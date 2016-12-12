@@ -51,24 +51,21 @@
 #include <QApplication>
 
 #include "window.h"
+#include "teste.cpp"
 
 #include <QLabel>
+#include <QFile>
 
+extern float matriz[10000][3];
 
 int main(int argc, char *argv[])
 {
 
     QApplication app(argc, argv);
 
-    int a = 640;
-    int b = 480;
-    int matrix[a][b];
+    int numIters = 300;
 
-    for (int i = 0; i < a; i++)
-        for (int j = 0; j < b; j++)
-            matrix[i][j] = rand()%1;
-
-    Window window(a, b, 1, 1, *matrix);
+    Window window(numIters, *matriz);
     window.show();
     return app.exec();
 

@@ -16,7 +16,7 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
-    void setPaintMatrix (int matWidth, int matHeight, int *pointsMatrix);
+    void setPaintMatrix (int numIters, float *pointsMatrix);
 
 protected:
 
@@ -24,8 +24,8 @@ protected:
 
 private:
 
-    int numPCs, numIterations, width, height;
-    int mandelbrotSet[640][480];
+    int numIterations;
+    float mandelbrotSet[10000][3];
 
 };
 
