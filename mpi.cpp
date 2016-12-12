@@ -32,17 +32,28 @@ int main(int argc, char* argv[]){
     MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
+    if(taskid==0){
+    	cout<<"Sistemas Operacionais - 13/12/2016"<<endl;
+    	cout<<"Andrei e Vinicius"<<endl;
+    	cout<<"Conjunto de Mandelbrot Paralelo\n"<<endl;
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	cout<<"Processo número "<<taskid<<" criado"<<endl;
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
 	register const unsigned short dimensao_x= 3/PASSO;
 	register const unsigned short dimensao_y= 1/PASSO;
 
 	if(taskid==0){
-		cout<<"Programa iniciado com "<<dimensao_x*dimensao_y << " pontos"<<endl;
+		cout<<"Programa iniciado com "<<dimensao_x*dimensao_y << " pontos.\n"<<endl;
 	}
 
 	float matriz[dimensao_x][dimensao_y][3];
-	//bool results[dimensao_x][dimensao_y];
 
 	unsigned int i, j;
+	double startClock;
 
 	register float x,y,d;
 	string json="";//"{";
@@ -55,9 +66,18 @@ int main(int argc, char* argv[]){
 	unsigned short rank;
 
 	// gera uma matriz de pontos
+	if(taskid==0){
+		cout<<"Iniciando geração de pontos."<<endl;
+	    startClock = MPI_Wtime();
+	}
+
 	#pragma omp parallel private(rank,x,y,d,tempx,tempy,tempd,i,j) firstprivate(meta,taskid) shared(matriz,json)
 	{
 		rank = omp_get_thread_num();
+		#pragma omp critical
+		{
+			cout<<"Thread "<<rank<<" criada pelo processo "<<taskid<<endl;
+		}
 		
 
 		#pragma omp for collapse(2)
@@ -72,6 +92,12 @@ int main(int argc, char* argv[]){
 				}	
 
 			}
+		}
+
+		if(taskid==0 && rank==0){
+			cout<<"Geração finalizada em: "<< MPI_Wtime() - startClock<<"s."<<endl;
+			cout<<"\nIniciando cálculos para o conjunto de pontos."<<endl;
+			startClock = MPI_Wtime();
 		}
 
 		// calcula quais pontos da matriz anterior são do conjunto
@@ -99,8 +125,13 @@ int main(int argc, char* argv[]){
 
 		#pragma omp critical
 		{
-			//cout<<"thread "<<rank<<", meta :\n"<<meta<<endl;
 			json +=meta;
+		}
+
+		if(taskid==0 && rank==0){
+			cout<<"Cálculo finalizado em: "<< MPI_Wtime() -startClock<<"s."<<endl;
+			cout<<"\nEstabelecendo comunicação entre os processos."<<endl;
+			startClock = MPI_Wtime();
 		}
 
 	}
@@ -117,8 +148,10 @@ int main(int argc, char* argv[]){
 		char *buf = new char[l];
 		MPI::COMM_WORLD.Recv(buf, l, MPI::CHAR, 1, 1, status);
 		string jsonReceived(buf, l);
-		cout<<"received: "<<jsonReceived<<endl;
 		delete [] buf;
+
+		cout<<"Comunicação finalizada em: "<< MPI_Wtime() -startClock<<"s."<<endl;
+		cout<<"\nJob Concluído!"<<endl;
 	
 		out << json;//<<"};";
 		out << jsonReceived;
