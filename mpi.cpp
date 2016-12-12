@@ -5,12 +5,12 @@
 #include <fstream>
 #include <omp.h>
 #include <mpi.h>
-#define PASSO 0.005
+//#define PASSO 0.001
 
 /*
 Para rodar:
 mpic++ -fopenmp -std=c++11 -o mpi mpi.cpp
-mpirun -np 2 ./mpi
+mpirun -np 2 ./mpi teste.csv 0.002
 */
 
 using namespace std;
@@ -37,6 +37,8 @@ int main(int argc, char* argv[]){
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
     MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+
+    const float PASSO = atof(argv[2]);
 
     if(taskid==0){
     	cout<<"Sistemas Operacionais - 13/12/2016"<<endl;
@@ -69,7 +71,7 @@ int main(int argc, char* argv[]){
 	ofstream out;
 	if(taskid==0){
 		out.open(argv[1]);
-		out<<"float matriz["<<dimensao_x*dimensao_y*2<<"][3] = {\n";
+		//out<<"float matriz["<<dimensao_x*dimensao_y*2<<"][3] = {\n";
 	}
 	unsigned short rank;
 
@@ -120,7 +122,7 @@ int main(int argc, char* argv[]){
 				tempy = to_string(y).substr(0,6);
 				tempd = to_string(d).substr(0,5);
 				
-				meta+="{"+tempx+","+tempy+","+tempd+"},";	
+				meta+=""+tempx+","+tempy+","+tempd+"\n";	
 			
 			}
 		}
@@ -153,7 +155,7 @@ int main(int argc, char* argv[]){
 		cout<<"Comunicação finalizada em: "<< MPI_Wtime() -startClock<<"s."<<endl;
 		jsonReceived.pop_back();
 		out << json;
-		out << jsonReceived<<"\n};";
+		out << jsonReceived;//<<"\n};";
 		out.close();
 		cout<<"\nJob Concluído!"<<endl;
 	}
